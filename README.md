@@ -12,17 +12,17 @@ kxk n個 convolution kernels => linear/relu => activation map => kxk 1個 convol
 
 256 samples/batch, Adam default parameters, 50 epochs
 
-###Activation map稀疏表達的可能性
+### Activation map稀疏表達的可能性
 
 可以藉由norm 1(對activation map取絕對值加總)進行稀疏化。然而，要達到真正的稀疏性，也就是要為0或足夠接近0才能算為稀疏，在單純的線性模型下較難以調整到，若加了ReLU就容易許多，實驗也證實了此現象。因此，對於稀疏的強制性我會加入ReLU轉換來進行實驗。
 
 整個Loss函數變為:
 
-$MSE(X, \hat{X}) + \beta Average(|\texttt{ActivationMap}|)$
+$ MSE(X, \hat{X}) + \beta Average(|\texttt{ActivationMap}|) $
 
-其中$\beta$是稀疏項的權重值，我們的目標還是為了要還原$X$，因此這裡設$\beta=0.5$
+其中$\beta$是稀疏項的權重值，我們的目標還是為了要還原$X$，因此這裡設$ \beta=0.5 $
 
-###Convolution的參數選擇，對稀疏編碼的難易程度
+### Convolution的參數選擇，對稀疏編碼的難易程度
 
 這邊列表出convolution kernel的大小、數量選擇，經過50 epoch的訓練後，能到達的稀疏程度以及對整個training set的MSE表現：
 
@@ -79,7 +79,7 @@ Kernel 5x5
 
 兩者也是看不出有什麼規則。
 
-###Upsampling： resize-convolution vs deconvolution
+### Upsampling： resize-convolution vs deconvolution
 
 比較的方式如果在比較常見的情況下進行比較會比較有意義。因此，在不做稀疏限制下，比較的網路為:
 
