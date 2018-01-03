@@ -2,7 +2,11 @@
 
 ## 簡介
 
+前次作業為全連接的編解碼器，這次改為用CNN的convolution/deconvolution的形式，進行單層的編碼與解碼。
 
+然而，將影像進行convolution得到的feature map大小和原影像大小是一致的(在有padding的情形下)，且會因kernel的數量設定得到一個較厚的volume。因此，不像上次作業一樣，可以確定影像有被編碼成較小容量的編碼，不能簡單判定convolution出來的volume得到了壓縮(稀疏表示)。若嘗試以sparse coding的精神，去最小化非零項的個數(如在tensorflow裡的count_nonzero函數，或使用sparse coding實務上常用的norm 1)，或許可以得到理想的稀疏表示法。
+
+若撇開強制稀疏性不談，在做deconvolution時根據此篇(https://distill.pub/2016/deconv-checkerboard/)所敘述，單純的deconvolution容易產生網格狀失真，改善的方法先進行內差放大activation map後再進行convolution，兩種方式都實驗看看是否得到品質改善。此外，可以由convolution的kernel大小以及數量兩個變因進行調整。將學到的kernel顯示出來，觀察是否為不重複且常見的feature filters。
 
 ## 實驗
 
@@ -18,8 +22,9 @@ kxk n個 convolution kernels => linear/relu => activation map => kxk 1個 convol
 
 整個Loss函數變為:
 
-$ MSE(X, \hat{X}) + \beta Average(|\texttt{ActivationMap}|) $
-
+$$
+MSE(X, \hat{X}) + \beta Average(|\texttt{ActivationMap}|)
+$$
 其中$\beta$是稀疏項的權重值，我們的目標還是為了要還原$X$，因此這裡設$ \beta=0.5 $
 
 ### Convolution的參數選擇，對稀疏編碼的難易程度
@@ -54,6 +59,8 @@ Kernel 5x5
 根據以上實驗，證實了kernel數愈多，可以達到愈稀疏的表示法，且可以達到更好的還原。但就非零元素數量而言，量級上並沒太的變動。且在大kernel的情形下，平均來說還原品質會比小kernel來得差，但非零元素量卻比小kernel來的少，也較為稀疏。
 
 在沒有稀疏條件下，還原效果好到差一個量級，不意外。但這邊稀疏程度不具參考價值，因為可能因不同的初使化方式而有所變動。
+
+然而，綜觀非零元素的數量，若以每batch有300000個非零數，則平均每張影像所編到的非零元素數量為$300000/256\approx1172$，並沒有達到壓縮的效果，反倒增加了資料量。因此，若單純用這樣的架構實現壓縮是不可行的。
 
 [^1]: 由於參數較多，訓練時epoch次數增加到100
 
