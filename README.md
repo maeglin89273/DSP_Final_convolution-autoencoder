@@ -6,7 +6,7 @@
 
 然而，將影像進行convolution得到的feature map大小和原影像大小是一致的(在有padding的情形下)，且會因kernel的數量設定得到一個較厚的volume。因此，不像上次作業一樣，可以確定影像有被編碼成較小容量的編碼，不能簡單判定convolution出來的volume得到了壓縮(稀疏表示)。若嘗試以sparse coding的精神，去最小化非零項的個數(如在tensorflow裡的count_nonzero函數，或使用sparse coding實務上常用的norm 1)，或許可以得到理想的稀疏表示法。
 
-若撇開強制稀疏性不談，在做deconvolution時根據此篇(https://distill.pub/2016/deconv-checkerboard/)所敘述，單純的deconvolution容易產生網格狀失真，改善的方法先進行內差放大activation map後再進行convolution，兩種方式都實驗看看是否得到品質改善。此外，可以由convolution的kernel大小以及數量兩個變因進行調整。將學到的kernel顯示出來，觀察是否為不重複且常見的feature filters。
+若撇開強制稀疏性不談，在做deconvolution時根據[此篇](https://distill.pub/2016/deconv-checkerboard/)所敘述，單純的deconvolution容易產生網格狀失真，改善的方法先進行內差放大activation map後再進行convolution，兩種方式都實驗看看是否得到品質改善。此外，可以由convolution的kernel大小以及數量兩個變因進行調整。將學到的kernel顯示出來，觀察是否為不重複且常見的feature filters。
 
 ## 實驗
 

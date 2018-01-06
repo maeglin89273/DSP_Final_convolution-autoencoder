@@ -16,7 +16,7 @@ def normalize(data, mean=None):
 def denormalize(norm_data, mean):
     return np.clip(255 * (norm_data + mean), 0, 255).astype(np.uint8)
 
-def build_sparse_conv_autoencoder(kernel_size, kernel_num, input_name='input'):
+def build_sparse_conv_autoencoder(kernel_size, kernel_num, beta=0.5, input_name='input'):
     input_batch = tf.placeholder(tf.float32, [None, 28, 28, 1], name=input_name)
     encode_filters = tf.Variable(tf.truncated_normal([kernel_size, kernel_size, 1, kernel_num], 0.0, 0.2))
     encode_biases = tf.Variable(tf.truncated_normal([kernel_num], 0, 0.2))
@@ -33,7 +33,7 @@ def build_sparse_conv_autoencoder(kernel_size, kernel_num, input_name='input'):
     decode_biases = tf.Variable(tf.truncated_normal([1], 0, 0.2))
     reconstruct = tf.nn.bias_add(tf.nn.conv2d(encode_out, decode_filters, [1, 1, 1, 1], 'SAME'), decode_biases)
 
-    loss = tf.losses.mean_squared_error(input_batch, reconstruct) + 0.5 * sparsity_loss
+    loss = tf.losses.mean_squared_error(input_batch, reconstruct) + beta * sparsity_loss
 
     optimizer = tf.train.AdamOptimizer()
     return encode_filters, (sparsity, non_zero_count), reconstruct, loss, optimizer.minimize(loss)
